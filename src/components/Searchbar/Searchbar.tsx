@@ -1,20 +1,25 @@
-import { useState } from "react";
-import PropTypes from "prop-types";
+import { ChangeEvent, FormEvent, useState } from "react";
+
 import { Notify } from "notiflix/build/notiflix-notify-aio";
 
-import { ReactComponent as SearchIcon } from "../../icons/searc.svg";
+import icons from "../../icons/search.svg";
 import makeSmoothScroll from "../../services/smoothScroll";
 
 import css from "./Searchbar.module.css";
 
-export default function Searchbar({ setSearchQuery, setCurrentPage }) {
+type Props = {
+	setSearchQuery(query: string): void;
+	setCurrentPage(page: number): void;
+};
+
+export default function Searchbar({ setSearchQuery, setCurrentPage }: Props) {
 	const [query, setQuery] = useState("");
 
-	const onInputChange = e => {
+	const onInputChange = (e: ChangeEvent<HTMLInputElement>) => {
 		setQuery(e.currentTarget.value);
 	};
 
-	const onSubmit = e => {
+	const onSubmit = (e: FormEvent) => {
 		e.preventDefault();
 
 		if (query.trim() !== "") {
@@ -36,7 +41,9 @@ export default function Searchbar({ setSearchQuery, setCurrentPage }) {
 				<button type="submit" className={css.button}>
 					<span className={css.label}></span>
 
-					<SearchIcon />
+					<svg width="32" height="32">
+						<use href={icons + "#search"}></use>
+					</svg>
 				</button>
 
 				<input
@@ -53,7 +60,3 @@ export default function Searchbar({ setSearchQuery, setCurrentPage }) {
 		</header>
 	);
 }
-
-Searchbar.propTypes = {
-	setSearchQuery: PropTypes.func.isRequired,
-};

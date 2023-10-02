@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, KeyboardEvent, MouseEvent } from "react";
 
 import Searchbar from "../Searchbar/Searchbar";
 import ImageGallery from "../ImageGallery/ImageGallery";
@@ -7,28 +7,35 @@ import Loader from "../Loader/Loader";
 import Button from "../Button/Button";
 import Modal from "../Modal/Modal";
 
-import fetchPhotos from "services/fetchPhotos";
+import fetchPhotos from "../../services/fetchPhotos";
+import { Image } from "../../@types/types";
 
 export default function App() {
-	const [images, setImages] = useState([]);
+	const [images, setImages] = useState<Array<Image>>([]);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [showLoader, setShowLoader] = useState(false);
-	const [currentModalImg, setCurrentModalImg] = useState({});
+	const [currentModalImg, setCurrentModalImg] = useState<Pick<Image, "largeImageURL" | "tags">>({
+		largeImageURL: "",
+		tags: "",
+	});
 	const [searchQuery, setSearchQuery] = useState("");
 	const [currentPage, setCurrentPage] = useState(1);
 
 	const closeModal = () => {
 		setIsModalOpen(false);
-		setCurrentModalImg({});
+		setCurrentModalImg({
+			largeImageURL: "",
+			tags: "",
+		});
 	};
 
-	const closeModalOnESCPress = e => {
+	const closeModalOnESCPress = (e: KeyboardEvent<Window>) => {
 		if (e.code === "Escape") {
 			return closeModal();
 		}
 	};
 
-	const closeModalOnClick = e => {
+	const closeModalOnClick = (e: MouseEvent<HTMLDivElement>) => {
 		const { currentTarget, target } = e;
 
 		if (currentTarget === target) {
@@ -36,10 +43,12 @@ export default function App() {
 		}
 	};
 
-	const onImgClick = e => {
-		const currentImg = images.find(image => image.id === Number(e.target.id));
-		setCurrentModalImg(currentImg);
-		setIsModalOpen(!isModalOpen);
+	const onImgClick = (e: MouseEvent<HTMLLIElement>) => {
+		const currentImg = images.find(image => image.id === Number((e.target as HTMLImageElement).id));
+		if (currentImg) {
+			setCurrentModalImg(currentImg);
+			setIsModalOpen(!isModalOpen);
+		}
 	};
 
 	useEffect(() => {
@@ -79,13 +88,7 @@ export default function App() {
 
 			{searchQuery && images.length > 0 && <Button setCurrentPage={setCurrentPage} />}
 
-			{isModalOpen && (
-				<Modal
-					closeModalOnESCPress={closeModalOnESCPress}
-					closeModal={closeModalOnClick}
-					currentModalImg={currentModalImg}
-				/>
-			)}
+			{isModalOpen && <Modal closeModalOnESCPress={closeModalOnESCPress} closeModal={closeModalOnClick} currentModalImg={currentModalImg} />}
 		</>
 	);
 }

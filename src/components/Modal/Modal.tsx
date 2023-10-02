@@ -1,9 +1,16 @@
-import { useEffect } from "react";
-import PropTypes from "prop-types";
+import { MouseEvent, useEffect } from "react";
+
+import { Image } from "../../@types/types";
 
 import css from "./Modal.module.css";
 
-export default function Modal({ closeModalOnESCPress, closeModal, currentModalImg: { largeImageURL, tags } }) {
+type Props = {
+	closeModalOnESCPress(e: { code: string }): void;
+	closeModal(e: MouseEvent<HTMLDivElement>): void;
+	currentModalImg: Pick<Image, "largeImageURL" | "tags">;
+};
+
+export default function Modal({ closeModalOnESCPress, closeModal, currentModalImg: { largeImageURL, tags } }: Props) {
 	useEffect(() => {
 		window.addEventListener("keydown", closeModalOnESCPress);
 
@@ -20,9 +27,3 @@ export default function Modal({ closeModalOnESCPress, closeModal, currentModalIm
 		</div>
 	);
 }
-
-Modal.propTypes = {
-	closeModalOnESCPress: PropTypes.func.isRequired,
-	currentModalImg: PropTypes.object.isRequired,
-	closeModal: PropTypes.func.isRequired,
-};
